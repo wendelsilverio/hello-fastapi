@@ -1,4 +1,5 @@
 # hello-fastapi
+
 Hello world with the resources needed to build a real REST service
 
 ## 🤖 Development
@@ -6,7 +7,7 @@ Hello world with the resources needed to build a real REST service
 The API can be run in _Development_ mode via the following command:
 
 ```bash
-fastapi dev main.py
+py main.py
 ```
 
 ## 🔌 Services, tools and components

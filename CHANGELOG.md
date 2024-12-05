@@ -9,4 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- .gitignore to JetBrains
+- OpenAPI version from pyproject.toml
+- Debug mode on PyCharm
+- src and tests folder layout
+- gitignore to JetBrains
