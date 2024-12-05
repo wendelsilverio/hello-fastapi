@@ -1,6 +1,3 @@
-import importlib.metadata
-from importlib.metadata import metadata
-
 import uvicorn
 from fastapi import FastAPI
 from importlib import metadata
