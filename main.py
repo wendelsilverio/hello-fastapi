@@ -24,9 +24,25 @@ app = FastAPI(
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
 
-@app.get('/')
-async def root():
-    return {'message': 'Hello World'}
+# Schemas ----------------------------------------------------------------------
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
+
+
+class User(BaseModel):
+    username: str
+    email: str | None = None
+    full_name: str | None = None
+    disabled: bool | None = None
+
+
+class UserInDB(User):
+    hashed_password: str
 
 
 # Security JWT -----------------------------------------------------------------
@@ -48,15 +64,6 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    username: str | None = None
-
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 fake_users_db = {
@@ -64,37 +71,19 @@ fake_users_db = {
         'username': 'johndoe',
         'full_name': 'John Doe',
         'email': 'johndoe@example.com',
-        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW", # secret
+        # password: secret
+        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
         'disabled': False,
     },
     'alice': {
         'username': 'alice',
         'full_name': 'Alice Wonderson',
         'email': 'alice@example.com',
-        'hashed_password': 'fakehashedsecret2',
+        # password: secret2
+        'hashed_password': '$2b$12$IQ9YLOYt9anuhzhHDDeUMOwFd8BZysw3RtIiIuutgY80bEQAgdLeW',
         'disabled': True,
     }
 }
-
-
-def fake_hash_password(password: str):
-    return 'fakehashed' + password
-
-
-@app.get('/protected-route')
-async def get_protected_route(token: Annotated[str, Depends(oauth2_scheme)]):
-    return {'token': token}
-
-
-class User(BaseModel):
-    username: str
-    email: str | None = None
-    full_name: str | None = None
-    disabled: bool | None = None
-
-
-class UserInDB(User):
-    hashed_password: str
 
 
 def get_user(db, username: str):
@@ -123,13 +112,6 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-def fake_decode_token(token):
-    # This doesn't provide any security at all
-    # Check the next version
-    user = get_user(fake_users_db, token)
-    return user
-
-
 def get_current_user(token: Annotated[(str, Depends(oauth2_scheme))]):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -139,8 +121,6 @@ def get_current_user(token: Annotated[(str, Depends(oauth2_scheme))]):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get('sub')
-        if username is None:
-            raise credentials_exception
         token_data = TokenData(username=username)
     except InvalidTokenError:
         raise credentials_exception
@@ -159,6 +139,17 @@ async def get_current_active_user(
             detail='Inactive user'
         )
     return current_user
+
+
+# Routes -----------------------------------------------------------------------
+@app.get('/')
+async def root():
+    return {'message': 'Hello World'}
+
+
+@app.get('/protected-route')
+async def get_protected_route(token: Annotated[str, Depends(oauth2_scheme)]):
+    return {'token': token}
 
 
 @app.post('/token')
@@ -187,7 +178,7 @@ async def login_for_access_token(
 
 @app.get('/users/me', response_model=User)
 async def read_users_me(
-        current_user: Annotated[User, Depends(get_current_active_user)]):
+        current_user: Annotated[User, Depends(get_current_user)]):
     return current_user
 
 
@@ -197,5 +188,6 @@ async def read_own_items(
     return [{'item_id': 'Foo', 'owner': current_user.username}]
 
 
+# Server -----------------------------------------------------------------------
 if __name__ == "__main__":
     uvicorn.run(app)
