@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Authentication with JWT
 - Settings to static files
 - Unit test example with pytest
 - OpenAPI version from pyproject.toml
