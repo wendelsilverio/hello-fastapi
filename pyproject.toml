@@ -21,6 +21,9 @@ dependencies = [
     'pytest-cov == 6.0.0',
 ]
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.coverage.report]
 # Regexes for lines to exclude from consideration
 exclude_also = [
