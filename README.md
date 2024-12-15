@@ -2,11 +2,23 @@
 
 Hello world with the resources needed to build a real REST service.
 
+## 🧩 Features
+
+- API Router by feature
+- Coverage report
+- Authentication with JWT
+- Settings to static files
+- Unit test example with pytest
+- OpenAPI version from pyproject.toml
+- Debug mode on PyCharm
+- src and tests folder layout
+- gitignore to JetBrains
+
 ## 🤖 Development
 
 The API can be run in _Development_ mode via the `py main.py` on _Command Prompt_.
 
-### Tests
+## 🧪 Tests
 
 All tests can be Run/Debug `pytest for tests` on _Pycharm_ or `pytest` on _Command Prompt_.
 

@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- src layout
+- API Router
 - Coverage report
 - Authentication with JWT
 - Settings to static files
